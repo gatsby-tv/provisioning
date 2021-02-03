@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-internal
+  labels:
+    app: ipfs
+spec:
+  ports:
+  - port: 5001
+    name: ipfs-pi
+    protocol: TCP
+  selector:
+    app: ipfs

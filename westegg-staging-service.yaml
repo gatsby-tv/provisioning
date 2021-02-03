@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: westegg
+  labels:
+    app: westegg
+spec:
+  ports:
+  - port: 3001
+    name: nodejs
+    protocol: TCP
+  selector:
+    app: westegg
+  type: NodePort
