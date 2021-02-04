@@ -1,0 +1,190 @@
+---
+
+- hosts: masters
+  remote_user: "{{ ansible_ssh_user }}"
+  become: true
+
+  tasks:
+
+  # TODO: Fix check
+  # - name: Check if K8s cluster was initialized
+  #   become: yes
+  #   become_user: "{{ ansible_ssh_user }}"
+  #   shell: kubectl cluster-info
+  #   register: k8s_init
+  #   ignore_errors: yes
+
+  - name: Initialize K8s cluster with kubeadm
+    shell: kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=192.168.0.0/16 > /var/log/kubeadm_init.log
+    # args:
+    #   creates: kubeadm_init.log
+    # when: k8s_init.stdout is not match(".*master is running.*")
+
+  - name: Copy worker node setup command to file
+    shell: tail -2 /var/log/kubeadm_init.log > /root/setup-worker.sh
+
+  # TODO: Better path handling
+  - name: Fetch setup command for worker nodes
+    fetch:
+      src: /root/setup-worker.sh
+      dest: '.'
+
+  - name: Setup kubeconfig for non-root user (1/2)
+    become: yes
+    become_user: "{{ ansible_ssh_user }}"
+    file:
+      path: $HOME/.kube
+      state: directory
+      mode: 0755
+
+  - name: Setup kubeconfig for non-root user (2/2)
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: /home/{{ ansible_ssh_user }}/.kube/config
+      remote_src: yes
+      owner: "{{ ansible_ssh_user }}"
+
+  - name: Setup certificate directories (1/3)
+    file:
+      path: /etc/ssl/csr
+      state: directory
+      mode: 0700
+
+  - name: Setup certificate directories (2/3)
+    file:
+      path: /etc/ssl/key
+      state: directory
+      mode: 0700
+
+  - name: Setup certificate directories (3/3)
+    file:
+      path: /etc/ssl/crt
+      state: directory
+      mode: 0700
+
+  # - name: Generate Calico certificate signing resource and key
+  #   community.crypto.openssl_csr:
+  #     path: /etc/ssl/csr/cni.csr
+  #     privatekey_path: /etc/ssl/key/cni.key
+  #     common_name: calico-cni
+
+  - name: Generate Calico certificate signing resource and key
+    shell: openssl req -newkey rsa:4096 -keyout /etc/ssl/key/cni.key -nodes -out /etc/ssl/csr/cni.csr -subj "/CN=calico-cni"
+
+  - name: Generate Calico certificate
+    openssl_certificate:
+      path: /etc/ssl/crt/cni.crt
+      csr_path: /etc/ssl/csr/cni.csr
+      ownca_path: /etc/kubernetes/pki/ca.crt
+      ownca_privatekey_path: /etc/kubernetes/pki/ca.key
+      provider: ownca
+
+  - name: Get master node address from kubectl config
+    shell: kubectl config view -o jsonpath='{.clusters[0].cluster.server}'
+    register: api_server
+
+  - name: Setup CNI config directory
+    file:
+      path: /etc/cni/config
+      state: directory
+      mode: 0700
+
+  - name: Kubectl set cluster to cni.kubeconfig
+    shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true --server={{ api_server.stdout }} --kubeconfig=/etc/cni/config/cni.kubeconfig"
+
+  - name: Kubectl set credentials for calico to cni.kubeconfig
+    shell: "kubectl config set-credentials calico-cni --client-certificate=/etc/ssl/crt/cni.crt --client-key=/etc/ssl/key/cni.key --embed-certs=true --kubeconfig=/etc/cni/config/cni.kubeconfig"
+
+  - name: Kubectl set context to cni.kubeconfig
+    shell: kubectl config set-context default --cluster=kubernetes --user=calico-cni --kubeconfig=/etc/cni/config/cni.kubeconfig
+
+  - name: Set kubectl to use new cni.kubeconfig
+    shell: kubectl config use-context default --kubeconfig=/etc/cni/config/cni.kubeconfig
+
+  # TODO: Better path handling
+  - name: Fetch cni.kubeconfig for use with other nodes
+    fetch:
+      src: /etc/cni/config/cni.kubeconfig
+      dest: '.'
+
+  - name: Create calico cluster role
+    become: true
+    become_user: '{{ ansible_ssh_user }}'
+    community.kubernetes.k8s:
+      state: present
+      definition:
+        kind: ClusterRole
+        apiVersion: rbac.authorization.k8s.io/v1
+        metadata:
+          name: calico-cni
+        rules:
+          # The CNI plugin needs to get pods, nodes, and namespaces.
+          - apiGroups: [""]
+            resources:
+              - pods
+              - nodes
+              - namespaces
+            verbs:
+              - get
+          # The CNI plugin patches pods/status.
+          - apiGroups: [""]
+            resources:
+              - pods/status
+            verbs:
+              - patch
+        # These permissions are required for Calico CNI to perform IPAM allocations.
+          - apiGroups: ["crd.projectcalico.org"]
+            resources:
+              - blockaffinities
+              - ipamblocks
+              - ipamhandles
+            verbs:
+              - get
+              - list
+              - create
+              - update
+              - delete
+          - apiGroups: ["crd.projectcalico.org"]
+            resources:
+              - ipamconfigs
+              - clusterinformations
+              - ippools
+            verbs:
+              - get
+              - list
+
+  - name: Create cluster role binding for calico
+    become: true
+    become_user: '{{ ansible_ssh_user }}'
+    shell: kubectl create clusterrolebinding calico-cni --clusterrole=calico-cni --user=calico-cni
+
+  - name: Download calico binary
+    get_url:
+      url: https://github.com/projectcalico/cni-plugin/releases/download/v3.14.0/calico-amd64
+      dest: /opt/cni/bin/calico
+      mode: '0755'
+
+  - name: Download calico-ipam binary
+    get_url:
+      url: https://github.com/projectcalico/cni-plugin/releases/download/v3.14.0/calico-ipam-amd64
+      dest: /opt/cni/bin/calico-ipam
+      mode: '0755'
+
+  - name: Create k8s CNI config dir
+    file:
+      path: /etc/cni/net.d
+      state: directory
+      mode: 0755
+
+  - name: Copy cni config to k8s config dir
+    copy:
+      src: /etc/cni/config/cni.kubeconfig
+      dest: /etc/cni/net.d/calico-kubeconfig
+      remote_src: true
+      mode: '0600'
+
+  - name: Write cni network config
+    copy:
+      dest: /etc/cni/net.d/10-calico.conflist
+      src: ./config/10-calico.conflist
+      mode: '0600'
