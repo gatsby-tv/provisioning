@@ -1,0 +1,40 @@
+---
+
+- hosts: masters
+  remote_user: "{{ ansible_ssh_user }}"
+  become: true
+
+  - name: Deploy IPFS node (1/3)
+    community.kubernetes.k8s:
+      state: present
+      src: k8s-definitions/ipfs-staging-deployment.yaml
+
+  - name: Deploy IPFS node (2/3)
+    community.kubernetes.k8s:
+      state: present
+      src: k8s-definitions/ipfs-staging-internal-service.yaml
+
+  - name: Deploy IPFS node (3/3)
+    community.kubernetes.k8s:
+      state: present
+      src: k8s-definitions/ipfs-staging-external-service.yaml
+
+  - name: Deploy Mongo node (1/2)
+    community.kubernetes.k8s:
+      state: present
+      src: k8s-definitions/mongo-staging-deployment.yaml
+
+  - name: Deploy Mongo node (2/2)
+    community.kubernetes.k8s:
+      state: present
+      src: k8s-definitions/mongo-staging-service.yaml
+
+  - name: Deploy westegg node (1/2)
+    community.kubernetes.k8s:
+      state: present
+      src: k8s-definitions/westegg-staging-deployment.yaml
+
+  - name: Deploy westegg node (2/2)
+    community.kubernetes.k8s:
+      state: present
+      src: k8s-definitions/westegg-staging-service.yaml
