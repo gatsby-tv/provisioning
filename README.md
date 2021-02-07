@@ -4,6 +4,8 @@ Provisioning scripts for creating a Kubernetes cluster to host GatsbyTV on.
 
 ## Usage
 
+**Read through these files before deploying them. Leaving certain fields as is is a security vulnerability.**
+
 Ansible is used for creating the cluster and deploying the services and deployments to it.
 
 - Create a `hosts.ini` file to contain your nodes names and IPs for ansible to use for deployment. `host.ini.example` contains an example of what this should look like.
