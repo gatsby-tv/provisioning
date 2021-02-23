@@ -1,6 +1,13 @@
 [all:vars]
 gateway = "192.168.122.1"
 ansible_python_interpreter = /usr/bin/python3
+database_root_password = "root"
+database_api_user = "gatsby"
+database_api_password = "gatsby"
+mongodb_protocol = "mongodb"
+mongodb_host = "mongodb.default"
+ipfs_uri = "http://ipfs-internal.default:5001"
+jwt_secret = "localhost"
 
 [masters]
 master-test-node ansible_ssh_host=192.168.122.215 ansible_ssh_user=nesbitt
