@@ -188,3 +188,15 @@
       dest: /etc/cni/net.d/10-calico.conflist
       src: ./config/10-calico.conflist
       mode: '0600'
+
+  - name: Deploy calico managment pods (1/2)
+    community.kubernetes.k8s:
+      state: present
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/tigera-operator.yaml
+
+  - name: Deploy calico managment pods (2/2)
+    community.kubernetes.k8s:
+      state: present
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/custom-resources.yaml
