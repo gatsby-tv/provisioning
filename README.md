@@ -16,6 +16,8 @@ Ansible is used for creating the cluster and deploying the services and deployme
 
 - Run `ansible-playbook -i hosts.ini provision-k8s-worker.yml --ask-pass -K` to setup the worker nodes and add them to the cluster.
 
+- Run `ansible-playbook -i hosts.ini deploy-westegg-staging.yaml --ask-pass -K` to deploy westegg and all the necessary components for staging to the cluster.
+
 ## Special Considerations
 
 These scripts are only designed to work on Debian based systems (specifically 10.7).
