@@ -4,37 +4,53 @@
   remote_user: "{{ ansible_ssh_user }}"
   become: true
 
-  - name: Deploy IPFS node (1/3)
-    community.kubernetes.k8s:
-      state: present
-      src: k8s-definitions/ipfs-staging-deployment.yaml
+  tasks:
 
-  - name: Deploy IPFS node (2/3)
+  - name: Create a k8s namespace
     community.kubernetes.k8s:
+      name: "{{ kubernetes_namespace }}"
+      api_version: v1
+      kind: Namespace
       state: present
-      src: k8s-definitions/ipfs-staging-internal-service.yaml
 
-  - name: Deploy IPFS node (3/3)
+  - name: Deploy IPFS (1/3)
     community.kubernetes.k8s:
       state: present
-      src: k8s-definitions/ipfs-staging-external-service.yaml
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/ipfs-staging-deployment.yaml
 
-  - name: Deploy Mongo node (1/2)
+  - name: Deploy IPFS (2/3)
     community.kubernetes.k8s:
       state: present
-      src: k8s-definitions/mongo-staging-deployment.yaml
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/ipfs-staging-internal-service.yaml
 
-  - name: Deploy Mongo node (2/2)
+  - name: Deploy IPFS (3/3)
     community.kubernetes.k8s:
       state: present
-      src: k8s-definitions/mongo-staging-service.yaml
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/ipfs-staging-external-service.yaml
 
-  - name: Deploy westegg node (1/2)
+  - name: Deploy Mongo (1/2)
     community.kubernetes.k8s:
       state: present
-      src: k8s-definitions/westegg-staging-deployment.yaml
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/mongo-staging-deployment.j2
 
-  - name: Deploy westegg node (2/2)
+  - name: Deploy Mongo (2/2)
     community.kubernetes.k8s:
       state: present
-      src: k8s-definitions/westegg-staging-service.yaml
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/mongo-staging-service.yaml
+
+  - name: Deploy westegg (1/2)
+    community.kubernetes.k8s:
+      state: present
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/westegg-staging-deployment.j2
+
+  - name: Deploy westegg (2/2)
+    community.kubernetes.k8s:
+      state: present
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/westegg-staging-service.yaml
