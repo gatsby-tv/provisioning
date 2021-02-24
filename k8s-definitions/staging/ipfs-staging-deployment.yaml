@@ -5,12 +5,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: ipfs
+      app: ipfs-staging
   replicas: 1
   template:
     metadata:
       labels:
-        app: ipfs
+        app: ipfs-staging
     spec:
       containers:
       - name: ipfs

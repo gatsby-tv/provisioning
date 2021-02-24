@@ -17,40 +17,40 @@
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/ipfs-staging-deployment.yaml
+      template: k8s-definitions/staging/ipfs-staging-deployment.yaml
 
   - name: Deploy IPFS (2/3)
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/ipfs-staging-internal-service.yaml
+      template: k8s-definitions/staging/ipfs-staging-internal-service.yaml
 
   - name: Deploy IPFS (3/3)
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/ipfs-staging-external-service.yaml
+      template: k8s-definitions/staging/ipfs-staging-external-service.yaml
 
   - name: Deploy Mongo (1/2)
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/mongo-staging-deployment.j2
+      template: k8s-definitions/staging/mongo-staging-deployment.j2
 
   - name: Deploy Mongo (2/2)
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/mongo-staging-service.yaml
+      template: k8s-definitions/staging/mongo-staging-service.yaml
 
   - name: Deploy westegg (1/2)
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/westegg-staging-deployment.j2
+      template: k8s-definitions/staging/westegg-staging-deployment.j2
 
   - name: Deploy westegg (2/2)
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/westegg-staging-service.yaml
+      template: k8s-definitions/staging/westegg-staging-service.yaml
