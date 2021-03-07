@@ -14,8 +14,14 @@
   #   register: k8s_init
   #   ignore_errors: yes
 
+  - name: Check if cluster is already initialized
+    shell: /bin/ss -tln | grep ":6443 " | sed -e 's/.*\///'
+    register:
+      ss_result
+
   - name: Initialize K8s cluster with kubeadm
     shell: kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=192.168.0.0/16 > /var/log/kubeadm_init.log
+    when: '"6443" in ss_result'
     # args:
     #   creates: kubeadm_init.log
     # when: k8s_init.stdout is not match(".*master is running.*")
@@ -156,7 +162,20 @@
   - name: Create cluster role binding for calico
     become: true
     become_user: '{{ ansible_ssh_user }}'
-    shell: kubectl create clusterrolebinding calico-cni --clusterrole=calico-cni --user=calico-cni
+    community.kubernetes.k8s:
+      state: present
+      definition:
+        kind: RoleBinding
+        metadata:
+          name: calico-cni
+          namespace: default
+        subjects:
+        - kind: User
+          name: calico-cni
+        roleRef:
+          kind: ClusterRole
+          name: calico-cni
+          apiGroup: rbac.authorization.k8s.io
 
   - name: Download calico binary
     get_url:
@@ -190,12 +209,16 @@
       mode: '0600'
 
   - name: Deploy calico managment pods (1/2)
+    become: yes
+    become_user: "{{ ansible_ssh_user }}"
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
       template: k8s-definitions/tigera-operator.yaml
 
   - name: Deploy calico managment pods (2/2)
+    become: yes
+    become_user: "{{ ansible_ssh_user }}"
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
