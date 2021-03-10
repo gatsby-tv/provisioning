@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: ipfs
-        image: ipfs/go-ipfs:bifrost-latest
+        image: gatsbytv/go-ipfs:v0.8.0
         ports:
         - containerPort: 4001
         - containerPort: 8081
