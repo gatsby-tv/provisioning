@@ -12,6 +12,11 @@ spec:
       labels:
         app: ipfs-staging
     spec:
+      volumes:
+      - name: nfs-share
+        nfs:
+          server: "{{ nfs_server_ip }}"
+          path: "{{ nfs_server_path_ipfs }}"
       containers:
       - name: ipfs
         image: gatsbytv/go-ipfs:v0.8.0
@@ -20,3 +25,6 @@ spec:
         - containerPort: 8081
         - containerPort: 8080
         - containerPort: 5001
+        volumeMounts:
+          - name: nfs-share
+            mountPath: /data/ipfs

@@ -17,7 +17,7 @@
     community.kubernetes.k8s:
       state: present
       namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/ipfs-staging-deployment.yaml
+      template: k8s-definitions/staging/ipfs-staging-deployment.j2
 
   - name: Deploy IPFS (2/3)
     community.kubernetes.k8s:

@@ -35,6 +35,10 @@ spec:
         - name: mongo-initdb
           configMap:
             name: mongo-initdb-config
+        - name: nfs-share
+          nfs:
+            server: "{{ nfs_server_ip }}"
+            path: "{{ nfs_server_path_mongo }}"
 ---
 apiVersion: v1
 kind: ConfigMap
