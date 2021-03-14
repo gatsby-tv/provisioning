@@ -20,8 +20,8 @@
       ss_result
 
   - name: Initialize K8s cluster with kubeadm
-    shell: kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=192.168.0.0/16 > /var/log/kubeadm_init.log
-    when: '"6443" in ss_result'
+    shell: "kubeadm init --node-name {{ ansible_hostname }} --pod-network-cidr=192.168.0.0/16 > /var/log/kubeadm_init.log"
+    when: not "6443" in ss_result.stdout
     # args:
     #   creates: kubeadm_init.log
     # when: k8s_init.stdout is not match(".*master is running.*")
@@ -85,10 +85,6 @@
       ownca_privatekey_path: /etc/kubernetes/pki/ca.key
       provider: ownca
 
-  - name: Get master node address from kubectl config
-    shell: kubectl config view -o jsonpath='{.clusters[0].cluster.server}'
-    register: api_server
-
   - name: Setup CNI config directory
     file:
       path: /etc/cni/config
@@ -96,7 +92,7 @@
       mode: 0700
 
   - name: Kubectl set cluster to cni.kubeconfig
-    shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true --server={{ api_server.stdout }} --kubeconfig=/etc/cni/config/cni.kubeconfig"
+    shell: "kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/pki/ca.crt --embed-certs=true --server=https://{{ ansible_ssh_host }}:6443 --kubeconfig=/etc/cni/config/cni.kubeconfig"
 
   - name: Kubectl set credentials for calico to cni.kubeconfig
     shell: "kubectl config set-credentials calico-cni --client-certificate=/etc/ssl/crt/cni.crt --client-key=/etc/ssl/key/cni.key --embed-certs=true --kubeconfig=/etc/cni/config/cni.kubeconfig"
@@ -159,23 +155,27 @@
               - get
               - list
 
-  - name: Create cluster role binding for calico
+#  - name: Create cluster role binding for calico
+#    become: true
+#    become_user: '{{ ansible_ssh_user }}'
+#    community.kubernetes.k8s:
+#      state: present
+#      definition:
+#        kind: RoleBinding
+#        metadata:
+#          name: calico-cni
+#        subjects:
+#        - kind: User
+#          name: calico-cni
+#        roleRef:
+#          kind: ClusterRole
+#          name: calico-cni
+#          apiGroup: rbac.authorization.k8s.io
+
+  - name: Create cluter role binding for calico
     become: true
     become_user: '{{ ansible_ssh_user }}'
-    community.kubernetes.k8s:
-      state: present
-      definition:
-        kind: RoleBinding
-        metadata:
-          name: calico-cni
-          namespace: default
-        subjects:
-        - kind: User
-          name: calico-cni
-        roleRef:
-          kind: ClusterRole
-          name: calico-cni
-          apiGroup: rbac.authorization.k8s.io
+    shell: kubectl create clusterrolebinding calico-cni --clusterrole=calico-cni --user=calico-cni
 
   - name: Download calico binary
     get_url:
@@ -223,3 +223,8 @@
       state: present
       namespace: "{{ kubernetes_namespace }}"
       template: k8s-definitions/custom-resources.yaml
+
+  - name: Allow master node to run pods
+    become: yes
+    become_user: "{{ ansible_ssh_user }}"
+    shell: kubectl taint nodes --all node-role.kubernetes.io/master-

@@ -41,6 +41,7 @@
       name:
         - curl
         - apt-transport-https
+        - nfs-common
 
   - name: Set static IP
     template:
