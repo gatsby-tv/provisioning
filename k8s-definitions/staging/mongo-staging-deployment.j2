@@ -31,6 +31,8 @@ spec:
         volumeMounts:
           - name: mongo-initdb
             mountPath: /docker-entrypoint-initdb.d
+          - name: nfs-share
+            mountPath: /data/db
       volumes:
         - name: mongo-initdb
           configMap:
