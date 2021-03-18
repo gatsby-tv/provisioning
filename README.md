@@ -2,6 +2,10 @@
 
 Provisioning scripts for creating a Kubernetes cluster to host GatsbyTV on.
 
+## Dependencies
+
+Some of the playbooks require the community.kubernetes ansible collection. This can be installed using `ansible-galaxy collection install community.kubernetes`.
+
 ## Usage
 
 **Read through these files before deploying them. Leaving certain fields as is is a security vulnerability.**
@@ -20,4 +24,4 @@ Ansible is used for creating the cluster and deploying the services and deployme
 
 ## Special Considerations
 
-These scripts are only designed to work on Debian based systems (specifically 10.7).
+These scripts are only designed to work on Debian based systems (specifically 10.7 & 10.8).
