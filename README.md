@@ -2,9 +2,16 @@
 
 Provisioning scripts for creating a Kubernetes cluster to host GatsbyTV on.
 
+## Definitions
+
+* Provisioner - The machine doing the provisioning - ie. a laptop you run the ansible playbooks from.
+* Guest - The machine being provisioned - ie. a server you're provisioning for deployment.
+
 ## Dependencies
 
 Some of the playbooks require the community.kubernetes ansible collection. This can be installed using `ansible-galaxy collection install community.kubernetes`.
+
+The provisioner machine may need `sshpass` installed. To run the initial setup playbook. Install this on Ubuntu and Debian provisioner machines with `sudo apt install sshpass -y`.
 
 ## Usage
 

@@ -51,11 +51,6 @@
       group: root
       mode: "0644"
 
-  # TODO: Not sending mail
-#  - name: Install mailx
-#    apt:
-#      name: mailutils
-
   - name: Install gpg
     apt:
       name: gnupg2
