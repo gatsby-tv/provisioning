@@ -35,7 +35,21 @@
       name: sshd
       state: restarted
 
-  # TODO: Install debugging/system utilities
+  - name: Install debugging/system utilities
+    apt:
+      force_apt_get: yes
+      name:
+        - vim
+        - nmap
+
+  - name: Configure vim
+    copy:
+      src: ./config/.vimrc
+      dest: "/home/{{ ansible_ssh_user }}/.vimrc"
+      owner: "{{ ansible_ssh_user }}"
+      group: "{{ ansible_ssh_user }}"
+      mode: "0744"
+
   - name: Install k8s dependencies
     apt:
       name:
@@ -154,8 +168,7 @@
     pip:
       name: openshift
 
-  # Automatic Updates
-
+  # TODO: Automatic Security Updates
   # roles:
   #   - role: jnv.unattended-upgrades
   #     unattended_origins_patterns:

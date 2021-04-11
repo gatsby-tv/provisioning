@@ -1,0 +1,14 @@
+- hosts: nas
+  remote_user: "{{ ansible_ssh_user }}"
+  become: true
+
+  tasks:
+
+  - name: Install NFS Server
+    apt:
+      force_apt_get: yes
+      name:
+        - nfs-kernel-server
+
+  # TODO: Configure NFS Share (path and ip range)
+  # TODO: Restart NFS after configured
