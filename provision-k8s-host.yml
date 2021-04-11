@@ -168,6 +168,8 @@
     pip:
       name: openshift
 
+  # TODO: Cannot talk to host over kubectl proxy, probably due to IP Tables configuration
+
   # TODO: Automatic Security Updates
   # roles:
   #   - role: jnv.unattended-upgrades
