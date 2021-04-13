@@ -41,6 +41,7 @@
       name:
         - vim
         - nmap
+        - net-tools
 
   - name: Configure vim
     copy:
