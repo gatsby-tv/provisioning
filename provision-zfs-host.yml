@@ -3,45 +3,44 @@
   become: true
 
   tasks:
+    # Setup ZFS required kernel headers and packages
+    - name: Install {{ ansible_kernel }} kernel headers
+      apt:
+        force_apt_get: yes
+        name:
+          - linux-headers-{{ ansible_kernel }}
 
-  # Setup ZFS required kernel headers and packages
-  - name: Install {{ ansible_kernel }} kernel headers
-    apt:
-      force_apt_get: yes
-      name:
-        - linux-headers-{{ ansible_kernel }}
+    - name: Add ZFS apt source (1/2)
+      replace:
+        path: /etc/apt/sources.list
+        regexp: "main$"
+        replace: "main contrib non-free"
+        backup: yes
 
-  - name: Add ZFS apt source (1/2)
-    replace:
-      path: /etc/apt/sources.list
-      regexp: 'main$'
-      replace: "main contrib non-free"
-      backup: yes
-  
-  - name: Add ZFS apt source (2/2)
-    apt:
-      update_cache: yes
+    - name: Add ZFS apt source (2/2)
+      apt:
+        update_cache: yes
 
-  - name: Enable ZFS modprobe
-    modprobe:
-     name: zfs
+    - name: Enable ZFS modprobe
+      modprobe:
+        name: zfs
 
-  - name: Install ZFS
-    apt:
-      force_apt_get: yes
-      name:
-        - zfsutils-linux
-        - zfs-dkms
+    - name: Install ZFS
+      apt:
+        force_apt_get: yes
+        name:
+          - zfsutils-linux
+          - zfs-dkms
 
-  - name: Enable ZFS services
-    systemd:
-      name: "{{ item }}"
-      enabled: yes
-      state: started
-    loop:
-      - zfs.target
-      - zfs-import-cache
-      - zfs-mount
-      - zfs-import.target
-      - zfs-import-scan
-      - zfs-share
+    - name: Enable ZFS services
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      loop:
+        - zfs.target
+        - zfs-import-cache
+        - zfs-mount
+        - zfs-import.target
+        - zfs-import-scan
+        - zfs-share

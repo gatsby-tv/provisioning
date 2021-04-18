@@ -39,6 +39,22 @@
       namespace: "{{ kubernetes_namespace }}"
       template: k8s-definitions/staging/ipfs-staging-external-service.yaml
 
+  - name: Deploy WebRTC Star (1/2)
+    become: true
+    become_user: "{{ ansible_ssh_user }}"
+    community.kubernetes.k8s:
+      state: present
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/staging/webrtc-star-staging-deployment.yaml
+
+  - name: Deploy WebRTC Star (2/2)
+    become: true
+    become_user: "{{ ansible_ssh_user }}"
+    community.kubernetes.k8s:
+      state: present
+      namespace: "{{ kubernetes_namespace }}"
+      template: k8s-definitions/staging/webrtc-star-staging-service.yaml
+
   - name: Deploy Mongo (1/2)
     become: true
     become_user: "{{ ansible_ssh_user }}"

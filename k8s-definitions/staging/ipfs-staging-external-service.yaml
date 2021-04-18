@@ -9,9 +9,11 @@ spec:
   - port: 4001
     name: ipfs-tcp
     protocol: TCP
+    nodePort: 30041
   - port: 8081
     name: ipfs-websocket
     protocol: TCP
+    nodePort: 30081
   selector:
     app: ipfs
   type: NodePort

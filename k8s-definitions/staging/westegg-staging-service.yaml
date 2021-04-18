@@ -9,6 +9,7 @@ spec:
   - port: 3001
     name: nodejs
     protocol: TCP
+    nodePort: 30031
   selector:
     app: westegg-staging
   type: NodePort

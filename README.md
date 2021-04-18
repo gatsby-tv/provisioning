@@ -28,19 +28,19 @@ Ansible is used for creating the cluster and deploying the services and deployme
 
 Before moving onto the next step, you may want to first configure a server or NAS to handle network file storage. To do this use the following two ansible playbooks to provision a single host to setup ZFS and NFS to share a storage pool over your network.
 
-- Run `ansible-playbook -i hosts.ini provision-zfs-host.yml --ask-pass -K` to setup the ZFS kernel headers and install necessary systemd ZFS services.
+- Run `ansible-playbook -i hosts.ini provision-zfs-host.yml -K` to setup the ZFS kernel headers and install necessary systemd ZFS services.
 - **IMPORTANT:** Manually setup your ZFS pool on the guest machine you ran the last playbook on before continuing.
-- Run `ansible-playbook -i hosts.ini provision-nfs-host.yml --ask-pass -K` to share the new ZFS pool with the network.
+- Run `ansible-playbook -i hosts.ini provision-nfs-host.yml -K` to share the new ZFS pool with the network.
 
 These scripts will only run for servers in your inventory under the `[nas]` section.
 
 **End Optional ZFS/NFS Section**
 
-- Run `ansible-playbook -i hosts.ini provision-k8s-master-init-cluster.yml --ask-pass -K` to setup the master node and initialize the cluster. Note: This must be done _before_ the worker nodes are configured.
+- Run `ansible-playbook -i hosts.ini provision-k8s-master-init-cluster.yml -K` to setup the master node and initialize the cluster. Note: This must be done _before_ the worker nodes are configured.
 
-- Run `ansible-playbook -i hosts.ini provision-k8s-worker.yml --ask-pass -K` to setup the worker nodes and add them to the cluster.
+- Run `ansible-playbook -i hosts.ini provision-k8s-worker.yml -K` to setup the worker nodes and add them to the cluster.
 
-- Run `ansible-playbook -i hosts.ini deploy-westegg-staging.yaml --ask-pass -K` to deploy westegg and all the necessary components for staging to the cluster.
+- Run `ansible-playbook -i hosts.ini deploy-westegg-staging.yaml -K` to deploy westegg and all the necessary components for staging to the cluster.
 
 ## Special Considerations
 

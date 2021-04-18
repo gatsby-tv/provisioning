@@ -10,5 +10,5 @@
       name:
         - nfs-kernel-server
 
-  # TODO: Configure NFS Share (path and ip range)
-  # TODO: Restart NFS after configured
+  # TODO: Configure NFS Share (path and ip range) /etc/exports
+  # TODO: Run exportfs -as
