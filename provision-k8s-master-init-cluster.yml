@@ -198,23 +198,20 @@
       src: ./config/10-calico.conflist
       mode: '0600'
 
-  # TODO: Openshift breaks next two commands
   # https://docs.projectcalico.org/getting-started/kubernetes/quickstart
-  # - name: Deploy calico management pods (1/2)
-  #   become: yes
-  #   become_user: "{{ ansible_ssh_user }}"
-  #   community.kubernetes.k8s:
-  #     state: present
-  #     # namespace: "{{ kubernetes_namespace }}"
-  #     template: k8s-definitions/tigera-operator.yaml
+  - name: Deploy calico management pods (1/2)
+    become: yes
+    become_user: "{{ ansible_ssh_user }}"
+    community.kubernetes.k8s:
+      state: present
+      template: k8s-definitions/tigera-operator.yaml
 
-  # - name: Deploy calico management pods (2/2)
-  #   become: yes
-  #   become_user: "{{ ansible_ssh_user }}"
-  #   community.kubernetes.k8s:
-  #     state: present
-  #     # namespace: "{{ kubernetes_namespace }}"
-  #     template: k8s-definitions/custom-resources.yaml
+  - name: Deploy calico management pods (2/2)
+    become: yes
+    become_user: "{{ ansible_ssh_user }}"
+    community.kubernetes.k8s:
+      state: present
+      template: k8s-definitions/custom-resources.yaml
 
   - name: Allow master node to run pods
     become: yes

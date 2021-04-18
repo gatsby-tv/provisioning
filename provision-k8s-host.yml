@@ -46,10 +46,13 @@
   - name: Configure vim
     copy:
       src: ./config/.vimrc
-      dest: "/home/{{ ansible_ssh_user }}/.vimrc"
-      owner: "{{ ansible_ssh_user }}"
-      group: "{{ ansible_ssh_user }}"
+      dest: "{{ item.dest }}"
+      owner: "{{ item.owner }}"
+      group: "{{ item.owner }}"
       mode: "0744"
+    with_items:
+      - { owner: "{{ ansible_ssh_user }}", dest: "/home/{{ ansible_ssh_user }}/.vimrc" }
+      - { owner: root, dest: /root/.vimrc }
 
   - name: Install k8s dependencies
     apt:
