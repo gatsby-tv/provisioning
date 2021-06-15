@@ -1,2 +1,5 @@
 # Testing hosts config
 hosts.ini
+
+.vscode/*
+!.vscode/settings.json

@@ -1,0 +1,70 @@
+# Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipfs-staging
+spec:
+  selector:
+    matchLabels:
+      app: ipfs-staging
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ipfs-staging
+    spec:
+      volumes:
+        - name: nfs-share
+          nfs:
+            server: "{{ nfs_server_ip }}"
+            path: "{{ nfs_server_path_ipfs }}"
+      containers:
+        - name: ipfs
+          image: gatsbytv/go-ipfs:v0.8.0
+          ports:
+            - containerPort: 4001
+            - containerPort: 8081
+            - containerPort: 8080
+            - containerPort: 5001
+          volumeMounts:
+            - name: nfs-share
+              mountPath: /data/ipfs
+
+# Service (Internal)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-staging-internal
+  labels:
+    app: ipfs
+spec:
+  ports:
+    - port: 5001
+      name: ipfs-pi
+      protocol: TCP
+  selector:
+    app: ipfs
+
+# Service (External)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-staging-external
+  labels:
+    app: ipfs
+spec:
+  ports:
+    - port: 4001
+      name: ipfs-tcp
+      protocol: TCP
+      nodePort: 30041
+    - port: 8081
+      name: ipfs-websocket
+      protocol: TCP
+      nodePort: 30081
+  selector:
+    app: ipfs
+  type: NodePort

@@ -1,0 +1,19 @@
+# This file is just to hold some notes for now, will be removed once all below is automated
+
+# TODO: helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+# TODO: helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --set nfs.server=192.168.2.101 --set nfs.path=/storage/netdata
+# TODO: Apply netdata volumes
+# https://docs.ansible.com/ansible/latest/collections/community/kubernetes/helm_module.html
+# TODO: Install helm
+# TODO: Install netdata helm repo
+# helm repo add netdata https://netdata.github.io/helmchart
+# TODO: Install/upgrade netdata helm chart with keys
+# helm install -f services/netdata/override.yaml netdata netdata/netdata
+# - name: Upgrade netdata helm chart with keys
+#   become: true
+#   become_user: "{{ ansible_ssh_user }}"
+#   community.kubernetes.helm:
+#     name: netdata
+#     chart_ref: netdata/netdata
+#     release_namespace: netdata
+#     values: "{{ lookup('template', 'services/netdata.yaml') | from_yaml }}"

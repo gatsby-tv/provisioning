@@ -1,88 +1,46 @@
 ---
-
 - hosts: masters
   remote_user: "{{ ansible_ssh_user }}"
   become: true
 
   tasks:
+    - name: Create a k8s namespace
+      become: true
+      become_user: "{{ ansible_ssh_user }}"
+      community.kubernetes.k8s:
+        name: westegg-staging
+        api_version: v1
+        kind: Namespace
+        state: present
 
-  - name: Create a k8s namespace
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      name: "{{ kubernetes_namespace }}"
-      api_version: v1
-      kind: Namespace
-      state: present
+    - name: Deploy IPFS
+      become: true
+      become_user: "{{ ansible_ssh_user }}"
+      community.kubernetes.k8s:
+        state: present
+        namespace: westegg-staging
+        template: k8s-definitions/staging/ipfs.yaml.j2
 
-  - name: Deploy IPFS (1/3)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/ipfs-staging-deployment.j2
+    - name: Deploy WebRTC Star
+      become: true
+      become_user: "{{ ansible_ssh_user }}"
+      community.kubernetes.k8s:
+        state: present
+        namespace: westegg-staging
+        template: k8s-definitions/staging/webrtc-star.yaml.j2
 
-  - name: Deploy IPFS (2/3)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/ipfs-staging-internal-service.yaml
+    - name: Deploy Mongo
+      become: true
+      become_user: "{{ ansible_ssh_user }}"
+      community.kubernetes.k8s:
+        state: present
+        namespace: westegg-staging
+        template: k8s-definitions/staging/mongo.yaml.j2
 
-  - name: Deploy IPFS (3/3)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/ipfs-staging-external-service.yaml
-
-  - name: Deploy WebRTC Star (1/2)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/webrtc-star-staging-deployment.yaml
-
-  - name: Deploy WebRTC Star (2/2)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/webrtc-star-staging-service.yaml
-
-  - name: Deploy Mongo (1/2)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/mongo-staging-deployment.j2
-
-  - name: Deploy Mongo (2/2)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/mongo-staging-service.yaml
-
-  - name: Deploy westegg (1/2)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/westegg-staging-deployment.j2
-
-  - name: Deploy westegg (2/2)
-    become: true
-    become_user: "{{ ansible_ssh_user }}"
-    community.kubernetes.k8s:
-      state: present
-      namespace: "{{ kubernetes_namespace }}"
-      template: k8s-definitions/staging/westegg-staging-service.yaml
+    - name: Deploy westegg
+      become: true
+      become_user: "{{ ansible_ssh_user }}"
+      community.kubernetes.k8s:
+        state: present
+        namespace: westegg-staging
+        template: k8s-definitions/staging/westegg.yaml.j2

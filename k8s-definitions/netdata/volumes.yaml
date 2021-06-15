@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: netdata-parent-alarms
+spec:
+  capacity:
+    storage: 100Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs-client
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /storage/netdata
+    server: 192.168.2.101
+  claimRef:
+    name: netdata-parent-alarms
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: netdata-parent-database
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs-client
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /storage/netdata
+    server: 192.168.2.101
+  claimRef:
+    name: netdata-parent-database

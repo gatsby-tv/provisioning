@@ -1,0 +1,38 @@
+parent:
+  claiming:
+    enabled: true
+    token: ""
+    rooms: ""
+
+child:
+  claiming:
+    enabled: true
+    token: ""
+    rooms: ""
+  configs:
+    netdata:
+      data: |
+        [global]
+          memory mode = ram
+          history = 3600
+        [health]
+          enabled = no
+
+parent:
+  alarms:
+    storageclass: nfs-client
+
+  database:
+    storageclass: nfs-client
+
+image:
+  pullPolicy: IfNotPresent
+
+sd:
+  pullPolicy: IfNotPresent
+
+wgetImage:
+  pullPolicy: IfNotPresent
+
+sysctlImage:
+  pullPolicy: IfNotPresent

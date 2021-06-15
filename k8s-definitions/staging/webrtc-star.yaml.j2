@@ -1,0 +1,38 @@
+# Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webrtc-star-staging
+spec:
+  selector:
+    matchLabels:
+      app: webrtc-star-staging
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: webrtc-star-staging
+    spec:
+      containers:
+        - name: webrtc-star
+          image: libp2p/js-libp2p-webrtc-star
+          ports:
+            - containerPort: 9090
+
+# Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webrtc-star-staging
+  labels:
+    app: webrtc-star-staging
+spec:
+  ports:
+    - port: 9090
+      name: webrtc-star-staging
+      nodePort: 30090
+  selector:
+    app: webrtc-star-staging
+  type: NodePort

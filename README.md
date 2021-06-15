@@ -4,9 +4,9 @@ Provisioning scripts for creating a Kubernetes cluster to host GatsbyTV on.
 
 ## Definitions
 
-* Provision vs. Deploy - Provisioning is setting up a baseline OS (hardening/package management/configuration) and deploying is setting up a service that can be consumed that is run on provisioned hardware.
-* Provisioner - The machine doing the provisioning - ie. a laptop you run the ansible playbooks from.
-* Guest - The machine being provisioned - ie. a server you're provisioning for deployment.
+- Provision vs. Deploy - Provisioning is setting up a baseline OS (hardening/package management/configuration) and deploying is setting up a service that can be consumed that is run on provisioned hardware.
+- Provisioner - The machine doing the provisioning - ie. a laptop you run the ansible playbooks from.
+- Guest - The machine being provisioned - ie. a server you're provisioning for deployment.
 
 ## Dependencies
 
@@ -44,5 +44,5 @@ These scripts will only run for servers in your inventory under the `[nas]` sect
 
 ## Special Considerations
 
-* These scripts are only designed to work on Debian based systems (specifically 10.7, 10.8, & 10.9).
-* `ansible-playbook` version 2.10.x is required.
+- These scripts are only designed to work on Debian based systems (specifically 10.7, 10.8, & 10.9).
+- `ansible-playbook` version 2.10.x is required.
