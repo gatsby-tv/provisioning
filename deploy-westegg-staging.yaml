@@ -5,7 +5,6 @@
 
   tasks:
     - name: Create a k8s namespace
-      become: true
       become_user: "{{ ansible_ssh_user }}"
       community.kubernetes.k8s:
         name: westegg-staging
@@ -14,7 +13,6 @@
         state: present
 
     - name: Deploy IPFS
-      become: true
       become_user: "{{ ansible_ssh_user }}"
       community.kubernetes.k8s:
         state: present
@@ -22,7 +20,6 @@
         template: k8s-definitions/staging/ipfs.yaml.j2
 
     - name: Deploy WebRTC Star
-      become: true
       become_user: "{{ ansible_ssh_user }}"
       community.kubernetes.k8s:
         state: present
@@ -30,7 +27,6 @@
         template: k8s-definitions/staging/webrtc-star.yaml.j2
 
     - name: Deploy Mongo
-      become: true
       become_user: "{{ ansible_ssh_user }}"
       community.kubernetes.k8s:
         state: present
@@ -38,7 +34,6 @@
         template: k8s-definitions/staging/mongo.yaml.j2
 
     - name: Deploy westegg
-      become: true
       become_user: "{{ ansible_ssh_user }}"
       community.kubernetes.k8s:
         state: present
