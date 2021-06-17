@@ -3,3 +3,6 @@ hosts.ini
 
 .vscode/*
 !.vscode/settings.json
+
+# Local temporary directory for downloads
+tmp/
