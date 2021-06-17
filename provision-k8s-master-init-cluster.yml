@@ -22,7 +22,6 @@
         dest: "."
 
     - name: Setup kubeconfig for non-root user (1/2)
-      become: yes
       become_user: "{{ ansible_ssh_user }}"
       file:
         path: $HOME/.kube
@@ -37,6 +36,7 @@
         owner: "{{ ansible_ssh_user }}"
 
     - name: Create local tmp directory
+      become_user: "{{ ansible_ssh_user }}"
       local_action: file
       args:
         path: ./tmp
@@ -44,32 +44,31 @@
 
     # https://docs.projectcalico.org/getting-started/kubernetes/quickstart
     - name: Install Tigera Calico operator (1/2)
+      become_user: "{{ ansible_ssh_user }}"
       local_action: get_url
       args:
         url: https://docs.projectcalico.org/manifests/tigera-operator.yaml
         dest: ./tmp/tigera-operator.yaml
 
     - name: Install Tigera Calico operator (2/2)
-      become: true
       become_user: "{{ ansible_ssh_user }}"
       community.kubernetes.k8s:
         template: ./tmp/tigera-operator.yaml
         state: present
 
     - name: Install Calico custom resource (1/2)
+      become_user: "{{ ansible_ssh_user }}"
       local_action: get_url
       args:
         url: https://docs.projectcalico.org/manifests/custom-resources.yaml
         dest: ./tmp/custom-resources.yaml
 
     - name: Install Calico custom resource (2/2)
-      become: true
       become_user: "{{ ansible_ssh_user }}"
       community.kubernetes.k8s:
         template: ./tmp/custom-resources.yaml
         state: present
 
     - name: Allow master node to run pods
-      become: yes
       become_user: "{{ ansible_ssh_user }}"
       shell: kubectl taint nodes --all node-role.kubernetes.io/master-
