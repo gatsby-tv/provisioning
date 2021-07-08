@@ -6,3 +6,6 @@ hosts.ini
 
 # Local temporary directory for downloads
 tmp/
+
+# Directory for master node files
+master-node-files/
