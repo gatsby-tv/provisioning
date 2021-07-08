@@ -15,11 +15,10 @@
     - name: Copy worker node setup command to file
       shell: tail -2 /var/log/kubeadm_init.log > /root/setup-worker.sh
 
-    # TODO: Better path handling
     - name: Fetch setup command for worker nodes
       fetch:
         src: /root/setup-worker.sh
-        dest: "."
+        dest: "./master-node-files"
 
     - name: Setup kubeconfig for non-root user (1/2)
       become_user: "{{ ansible_ssh_user }}"
